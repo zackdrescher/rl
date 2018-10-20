@@ -25,7 +25,7 @@ def episode(model, env = None, render = False, epsilon = 0):
     D = deque() 
     done = False
     
-    for _ in range(1000):
+    while not done:
         
         env.render()
 
@@ -42,9 +42,6 @@ def episode(model, env = None, render = False, epsilon = 0):
 
         D.append((state, action, reward, state_new, done))         # 'Remember' action and consequence
         state = state_new  
-
-        if done:
-           break
 
     env.close()
 

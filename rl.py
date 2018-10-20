@@ -38,9 +38,9 @@ def episode(agent = None, env = None, render = False):
         state = state_new  
 
         if done:
-            break
+           break
 
-    env.render(close = True)
+    env.close()
 
     return D
 

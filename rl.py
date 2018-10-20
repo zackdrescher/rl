@@ -127,19 +127,16 @@ def initialize_model(obs_space, action_space):
     print("Model Initialized")
     return model
 
-def learn(model, D, mini_batch_size = None):
+def learn(model, D, sample_size = 2000, epochs = 3, minibatch = 64):
 
-    print("Learning...")
+    print("Learning %s expiriences %s times with minibathes %s" % (sample_size, epochs, minibatch))
 
-    if mini_batch_size is None:
-        mini_batch_size = len(D)
-
-    batch = random.sample(D, mini_batch_size)                              # Sample some moves
+    batch = random.sample(D, sample_size)                              # Sample some moves
 
     X, Y = bellman(batch, model)
 
     # Train network to output the Q function
-    model.train_on_batch(X, Y)
+    model.fit(X, Y, epochs = epochs, batch_size= minibatch)
 
     print("Learning complete")
     
@@ -181,20 +178,43 @@ def plot_rewards(d):
 
 if __name__ == '__main__':
 
+
+    # INIT
     env = gym.make(DEFAULT_ENV)
 
     model = initialize_model(env.observation_space, env.action_space)
 
-    D = observe(1000, model, env = env, render= True, epsilon=1)
+    # FIRST RANDOM OBSERVATION
+    D = observe(10000, model, env = env, epsilon=1)
 
-    learn(model, D)
+    # LEARN
+    learn(model, D, sample_size= 4 * 1024, epochs= 3)
+
+    # EVALUATE
+    print('Evaluating Model...')
+    model_r, model_d = evaluate_model(20, model, env, True, epsilon=0)
+    print('Evaluating random...')
+    random_r, random_d = evaluate_model(20, model, env, True, epsilon=1)
+
+    D += model_d + random_d
+
+    d = {'model1' : model_r, 'random' : random_r}
+    plot_rewards(d)
+
+    # SECOND OBSERVATION
+    D = observe(10000, model, env = env, epsilon=0.7)
+
+    learn(model, D, sample_size= 8 * 1024, epochs=3)
 
     print('Evaluating Model...')
     model_r, model_d = evaluate_model(20, model, env, True, epsilon=0)
     print('Evaluating random...')
     random_r, random_d = evaluate_model(20, model, env, True, epsilon=1)
 
-    d = {'model' : model_r, 'random' : random_r}
+    D += model_d + random_d
+
+    d['model2'] =  model_r
+    d['random'] +=  random_r
     plot_rewards(d)
 
     

@@ -43,7 +43,8 @@ def episode(model, env = None, render = False, epsilon = 0):
 
     while not done:
         
-        env.render()
+        if render:
+            env.render()
 
         if np.random.rand() <= epsilon:
             action = np.random.randint(0, env.action_space.n, size=1)[0]
@@ -82,7 +83,8 @@ def observe(num_obs, model, env = None, render = False, epsilon = 0):
     
     for _ in range(num_obs):
         
-        env.render()
+        if render:
+            env.render()
 
         if np.random.rand() <= epsilon:
             action = np.random.randint(0, env.action_space.n, size=1)[0]

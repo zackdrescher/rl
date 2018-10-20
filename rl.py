@@ -49,6 +49,8 @@ def episode(model, env = None, render = False, epsilon = 0):
 def observe(num_obs, model, env = None, render = False, epsilon = 0):
     """Runs an episode of the sumulation with the given Q model"""
 
+    print("Observing...")
+
     if env is None:
         env = gym.make(DEFAULT_ENV)
 
@@ -85,9 +87,12 @@ def observe(num_obs, model, env = None, render = False, epsilon = 0):
 
     env.close()
 
+    print("Observation complete")
     return D
 
 def initialize_model(obs_space, action_space):
+
+    print("Intilaizing Model...")
 
     # Create network. Input is two consecutive game states, output is Q-values of the possible moves.
     model = Sequential()
@@ -99,6 +104,7 @@ def initialize_model(obs_space, action_space):
 
     model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
+    print("Model Initialized")
     return model
 
 if __name__ == '__main__':

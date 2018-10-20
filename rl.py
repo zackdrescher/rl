@@ -14,6 +14,8 @@ def episode(model, env = None, render = False, epsilon = 0):
     """Runs an episode of the sumulation with the given Q model
     Epsilon is the probability of doing a random move"""
 
+    print("Starting Episode...")
+
     if env is None:
         env = gym.make(DEFAULT_ENV)
 
@@ -46,6 +48,8 @@ def episode(model, env = None, render = False, epsilon = 0):
         state = state_new  
 
     env.close()
+
+    print('Episode completed with %s points.' % total_reward)
 
     return D, total_reward
 

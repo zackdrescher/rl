@@ -61,7 +61,7 @@ def episode(model, env = None, render = False, epsilon = 0):
         state = state_new  
 
     env.close()
-    
+
     return D, total_reward
 
 def observe(num_obs, model, env = None, render = False, epsilon = 0):
@@ -164,6 +164,19 @@ def bellman(D, model, gamma = 0.9):
 
     return inputs, targets
 
+def plot_rewards(d):
+
+    m = [max(v) for v in d.values()]
+    m = max(m)
+    bins = np.linspace(0, m, 10)
+
+    plt.Figure()
+    for k, v in d.items():
+        plt.hist(v, bins = bins, alpha = 0.5, label = k)
+    
+    plt.legend()
+    plt.show()
+
 if __name__ == '__main__':
 
     env = gym.make(DEFAULT_ENV)
@@ -179,14 +192,10 @@ if __name__ == '__main__':
     print('Evaluating random...')
     random_r, random_d = evaluate_model(20, model, env, True, epsilon=1)
 
-    m = max(max(model_r), max(random_r))
-    bins = np.linspace(0, m, 10)
+    d = {'model' : model_r, 'random' : random_r}
+    plot_rewards(d)
 
-    plt.Figure()
-    plt.hist(model_r, bins = bins, alpha = 0.5, label = 'model')
-    plt.hist(random_r, bins = bins, alpha = 0.5, label = 'random')
-    plt.legend()
-    plt.show()
+    
 
 
 

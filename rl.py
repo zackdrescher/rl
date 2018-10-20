@@ -81,7 +81,7 @@ def observe(num_obs, model, env = None, render = False, epsilon = 0):
     D = deque() 
     done = False
     
-    for _ in range(num_obs):
+    for _ in tqdm(range(num_obs)):
         
         if render:
             env.render()

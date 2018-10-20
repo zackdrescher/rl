@@ -5,7 +5,7 @@ import random
 from keras.models import Sequential    
 from keras.layers import Dense, Flatten 
 
-DEFAULT_ENV = 'CartPole-v0'
+DEFAULT_ENV = 'CartPole-v1'
 
 def episode(model, env = None, render = False, epsilon = 0):
     """Runs an episode of the sumulation with the given Q model"""

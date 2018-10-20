@@ -4,17 +4,30 @@ import numpy as np
 import random
 from keras.models import Sequential    
 from keras.layers import Dense, Flatten 
-# Just disables the warning, doesn't enable AVX/FMA
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 DEFAULT_ENV = 'CartPole-v1'
 
+def evaluate_model(num_eps, model, env = None, render = False, epsilon = 0):
+
+    r = []
+    D = deque()
+
+    for i in tqdm(range(num_eps), desc = 'Evaluating...'):
+        d, total_reward = episode(model, env, render, epsilon)
+        
+        D += d
+        r.append(total_reward)
+
+    return r, D
+
 def episode(model, env = None, render = False, epsilon = 0):
     """Runs an episode of the sumulation with the given Q model
     Epsilon is the probability of doing a random move"""
-
-    print("Starting Episode...")
 
     if env is None:
         env = gym.make(DEFAULT_ENV)
@@ -48,9 +61,7 @@ def episode(model, env = None, render = False, epsilon = 0):
         state = state_new  
 
     env.close()
-
-    print('Episode completed with %s points.' % total_reward)
-
+    
     return D, total_reward
 
 def observe(num_obs, model, env = None, render = False, epsilon = 0):
@@ -163,7 +174,19 @@ if __name__ == '__main__':
 
     learn(model, D)
 
-    D2 = observe(1000, model, env=env, render=True)
+    print('Evaluating Model...')
+    model_r, model_d = evaluate_model(20, model, env, True, epsilon=0)
+    print('Evaluating random...')
+    random_r, random_d = evaluate_model(20, model, env, True, epsilon=1)
+
+    m = max(max(model_r), max(random_r))
+    bins = np.linspace(0, m, 10)
+
+    plt.Figure()
+    plt.hist(model_r, bins = bins, alpha = 0.5, label = 'model')
+    plt.hist(random_r, bins = bins, alpha = 0.5, label = 'random')
+    plt.legend()
+    plt.show()
 
 
 

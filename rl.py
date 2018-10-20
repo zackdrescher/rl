@@ -24,7 +24,8 @@ def episode(model, env = None, render = False, epsilon = 0):
 
     D = deque() 
     done = False
-    
+    total_reward = 0
+
     while not done:
         
         env.render()
@@ -36,7 +37,8 @@ def episode(model, env = None, render = False, epsilon = 0):
             action = np.argmax(Q)  
 
         observation_new, reward, done, info = env.step(action) # take a random action
-        
+        total_reward += reward
+
         obs_new = np.expand_dims(observation_new, axis=0)          # (Formatting issues)
         state_new = np.append(np.expand_dims(obs_new, axis=0), state[:, :1, :], axis=1) 
 
@@ -45,7 +47,7 @@ def episode(model, env = None, render = False, epsilon = 0):
 
     env.close()
 
-    return D
+    return D, total_reward
 
 def observe(num_obs, model, env = None, render = False, epsilon = 0):
     """Runs an episode of the sumulation with the given Q model"""

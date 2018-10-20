@@ -97,11 +97,11 @@ def initialize_model(obs_space, action_space):
 
     # Create network. Input is two consecutive game states, output is Q-values of the possible moves.
     model = Sequential()
-    model.add(Dense(20, input_shape=(2,) + obs_space.shape, init='uniform', activation='relu'))
+    model.add(Dense(20, input_shape=(2,) + obs_space.shape, kernel_initializer='uniform', activation='relu'))
     model.add(Flatten())       # Flatten input so as to have no problems with processing
-    model.add(Dense(18, init='uniform', activation='relu'))
-    model.add(Dense(10, init='uniform', activation='relu'))
-    model.add(Dense(action_space.n, init='uniform', activation='linear'))    # Same number of outputs as possible actions
+    model.add(Dense(18, kernel_initializer='uniform', activation='relu'))
+    model.add(Dense(10, kernel_initializer='uniform', activation='relu'))
+    model.add(Dense(action_space.n, kernel_initializer='uniform', activation='linear'))    # Same number of outputs as possible actions
 
     model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 

@@ -94,7 +94,7 @@ class DQN:
             else:
                 X, Y = self.bellman(len(self.D))
 
-            self.model.fit(X,Y, epochs=1)
+            self.model.fit(X,Y, epochs=1, batch_size = 1,verbose=0)
 
         self.env.close()
         
@@ -125,22 +125,27 @@ class DQN:
 
         return inputs, targets
 
+    def run_episodes(self, num_episodes, min_epsilon = .1, render = False):
+        d = []
+        epslion = 0.9
+
+        for i in tqdm(range(num_episodes), desc='Running Episodes'):
+
+            e = epslion ** i
+            if e < min_epsilon:
+                e = min_epsilon
+
+            d.append((i, self.episode(epsilon= e, render=render)))
+
+        return d
+
 if __name__ == '__main__':
 
     m = DQN()
 
-    num_eps = 100
-    epslion = 0.9
+    d = m.run_episodes(100, render=True)
 
-    d = []
-
-    for i in range(num_eps):
-
-        e = epslion ** i
-        if e < .1:
-            e = .1
-
-        d.append((i, m.episode(epsilon= e, render=True)))
+    
 
 
 

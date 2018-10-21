@@ -86,6 +86,7 @@ class DQN:
             # get the new state
             s_new = self.phi(s, x_new)
             self.D.append((s, action, reward, s_new, done))
+            s = s_new
             
             if minibatch_size < len(self.D):
                 X, Y = self.bellman(minibatch_size)

@@ -176,8 +176,25 @@ def plot_rewards(d):
     plt.legend()
     plt.show()
 
-if __name__ == '__main__':
+def learn_n_eval(env, model, D, eval_steps = 20, sample_size = None, epochs = None):
 
+    # LEARN
+    learn(model, D, sample_size= sample_size, epochs= epochs)
+
+    # EVALUATE
+    print('Evaluating Model...')
+    model_r, model_d = evaluate_model(20, model, env, True, epsilon=0)
+    print('Evaluating random...')
+    random_r, random_d = evaluate_model(20, model, env, True, epsilon=1)
+
+    
+
+    d = {'model1' : model_r, 'random' : random_r}
+    plot_rewards(d)
+
+    return  model_d + random_d
+
+if __name__ == '__main__':
 
     # INIT
     env = gym.make(DEFAULT_ENV)
@@ -187,37 +204,15 @@ if __name__ == '__main__':
     # FIRST RANDOM OBSERVATION
     D = observe(10000, model, env = env, epsilon=1)
 
-    # LEARN
-    learn(model, D, sample_size= 4 * 1024, epochs= 3)
+    D += learn_n_eval(env, model, D, sample_size= 4 * 1024, epochs=3)
 
-    # EVALUATE
-    print('Evaluating Model...')
-    model_r, model_d = evaluate_model(20, model, env, True, epsilon=0)
-    print('Evaluating random...')
-    random_r, random_d = evaluate_model(20, model, env, True, epsilon=1)
+    for i in range(20):
+        
+        print("Observation %s" % i)
+        D += observe(10000, model, env = env, epsilon=0.9 ** i)
 
-    D += model_d + random_d
+        D += learn_n_eval(env, model, D, sample_size= (i+1) * 8 * 1024, epochs=3)
 
-    d = {'model1' : model_r, 'random' : random_r}
-    plot_rewards(d)
-
-    # SECOND OBSERVATION
-    D = observe(10000, model, env = env, epsilon=0.7)
-
-    learn(model, D, sample_size= 8 * 1024, epochs=3)
-
-    print('Evaluating Model...')
-    model_r, model_d = evaluate_model(20, model, env, True, epsilon=0)
-    print('Evaluating random...')
-    random_r, random_d = evaluate_model(20, model, env, True, epsilon=1)
-
-    D += model_d + random_d
-
-    d['model2'] =  model_r
-    d['random'] +=  random_r
-    plot_rewards(d)
-
-    
 
 
 

@@ -14,7 +14,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 DEFAULT_ENV = 'CartPole-v1'
-DEFAULT_MEM = 10**6
+DEFAULT_MEM = 10000
 
 class DQN:
 
@@ -94,10 +94,10 @@ class DQN:
             else:
                 X, Y = self.bellman(len(self.D))
 
-            self.model.fit(X,Y, epochs=1, batch_size = 1,verbose=0)
+            self.model.fit(X,Y, epochs=1, verbose=0)
 
         self.env.close()
-        
+        #print(total_reward)
         return total_reward
 
     def bellman(self, batch_size, gamma = 0.9):
@@ -125,17 +125,20 @@ class DQN:
 
         return inputs, targets
 
-    def run_episodes(self, num_episodes, min_epsilon = .1, render = False):
+    def run_episodes(self, num_episodes, min_epsilon = .1, min_prop = .1, render = False):
         d = []
-        epslion = 0.9
+        epsilon = np.linspace(1, min_epsilon, num_episodes * (1-min_prop))
 
-        for i in tqdm(range(num_episodes), desc='Running Episodes'):
+        for i in range(num_episodes):
 
-            e = epslion ** i
-            if e < min_epsilon:
+            if i >= len(epsilon):
                 e = min_epsilon
+            else:
+                e = epsilon[i]
 
-            d.append((i, self.episode(epsilon= e, render=render)))
+            x = (i, e, self.episode(epsilon= e, render=render))
+            print(x)
+            d.append(x)
 
         return d
 
@@ -143,7 +146,7 @@ if __name__ == '__main__':
 
     m = DQN()
 
-    d = m.run_episodes(100, render=True)
+    d = m.run_episodes(1000)
 
     
 

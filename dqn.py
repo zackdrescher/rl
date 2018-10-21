@@ -19,7 +19,7 @@ DEFAULT_MEM = 10**6
 class DQN:
 
     def __init__(self, env = DEFAULT_ENV, replay_mem = DEFAULT_MEM, 
-                phi_len = 2):
+                phi_len = 4):
 
         self.env = gym.make(env)
         self.D = deque(maxlen = DEFAULT_MEM)
@@ -67,7 +67,7 @@ class DQN:
         s = np.array([self.env.reset(),] * self.phi_len)
 
         done = False
-
+        total_reward = 0
         while not done:
 
             if render:
@@ -83,6 +83,7 @@ class DQN:
 
             # take the action
             x_new, reward, done, info = self.env.step(action)
+            total_reward += reward
             # get the new state
             s_new = self.phi(s, x_new)
             self.D.append((s, action, reward, s_new, done))
@@ -94,6 +95,10 @@ class DQN:
                 X, Y = self.bellman(len(self.D))
 
             self.model.fit(X,Y, epochs=1)
+
+        self.env.close()
+        
+        return total_reward
 
     def bellman(self, batch_size, gamma = 0.9):
 
@@ -123,7 +128,23 @@ class DQN:
 if __name__ == '__main__':
 
     m = DQN()
-    m.episode(render=True)
+
+    num_eps = 100
+    epslion = 0.9
+
+    d = []
+
+    for i in range(num_eps):
+
+        e = epslion ** i
+        if e < .1:
+            e = .1
+
+        d.append((i, m.episode(epsilon= e, render=True)))
+
+
+
+
 
 
 
